@@ -15,6 +15,12 @@ import java.util.List;
 public class TaskAdapter extends RecyclerView.Adapter<TaskRowHolder> {
 
     private List<Task> tasks = new LinkedList<Task>();
+    private TaskRowHolder.TaskCompletedListener taskCompletedListener;
+
+    public TaskAdapter(List<Task> tasks, TaskRowHolder.TaskCompletedListener taskCompletedListener) {
+        this.tasks = tasks;
+        this.taskCompletedListener = taskCompletedListener;
+    }
 
     public void addTask(Task task) {
         tasks.add(0, task);
@@ -24,7 +30,7 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskRowHolder> {
     @Override
     public TaskRowHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View itemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.view_task_row, parent, false);
-        return new TaskRowHolder(itemView);
+        return new TaskRowHolder(itemView, taskCompletedListener);
     }
 
     @Override
@@ -40,5 +46,9 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskRowHolder> {
     public void removeTask(int position) {
         tasks.remove(position);
         notifyItemRemoved(position);
+    }
+
+    public Task getTaskAtPosition(int position) {
+        return tasks.get(position);
     }
 }

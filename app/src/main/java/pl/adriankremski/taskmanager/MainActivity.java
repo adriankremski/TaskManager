@@ -13,12 +13,18 @@ import android.widget.TextView;
 
 import com.gordonwong.materialsheetfab.MaterialSheetFab;
 
+import java.util.LinkedList;
+import java.util.List;
+
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import io.realm.Realm;
+import io.realm.RealmResults;
 import pl.adriankremski.taskmanager.views.Fab;
+import pl.adriankremski.taskmanager.views.SwipeToDismissTouchListener;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements TaskRowHolder.TaskCompletedListener {
 
     @Bind(R.id.recycler)
     RecyclerView recyclerView;
@@ -37,7 +43,9 @@ public class MainActivity extends AppCompatActivity {
 
     private MaterialSheetFab materialSheetFab;
 
-    private TaskAdapter taskAdapter = new TaskAdapter();
+    private TaskAdapter taskAdapter;
+
+    private Realm realm;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,8 +57,26 @@ public class MainActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         setupMaterialSheetFab();
 
-        recyclerView.setAdapter(taskAdapter);
+        realm = Realm.getDefaultInstance();
+        RealmResults realmTasks = realm.where(Task.class).findAll();
+        recyclerView.setAdapter(taskAdapter = new TaskAdapter(extractTasksFromRealm(realmTasks), this));
         recyclerView.setLayoutManager(new LinearLayoutManager(getBaseContext()));
+
+        SwipeToDismissTouchListener swipeToDismissTouchListener = new SwipeToDismissTouchListener(recyclerView, new SwipeToDismissTouchListener.DismissCallbacks() {
+            @Override
+            public SwipeToDismissTouchListener.SwipeDirection canDismiss(int position) {
+                return SwipeToDismissTouchListener.SwipeDirection.RIGHT;
+            }
+
+            @Override
+            public void onDismiss(RecyclerView view, List<SwipeToDismissTouchListener.PendingDismissData> dismissData) {
+                for (SwipeToDismissTouchListener.PendingDismissData data : dismissData) {
+                    removeTaskFromRealm(taskAdapter.getTaskAtPosition(data.position));
+                    taskAdapter.removeTask(data.position);
+                }
+            }
+        });
+        recyclerView.addOnItemTouchListener(swipeToDismissTouchListener);
     }
 
     private void setupMaterialSheetFab() {
@@ -67,14 +93,52 @@ public class MainActivity extends AppCompatActivity {
         sheetView.setLayoutParams(params);
     }
 
+    private List<Task> extractTasksFromRealm(RealmResults<Task> realmResults) {
+        List<Task> tasks = new LinkedList<Task>();
+        for (Task realmTask : realmResults) {
+            tasks.add(realmTask);
+        }
+        return tasks;
+    }
+
+    private void removeTaskFromRealm(final Task taskToRemove) {
+        realm.executeTransaction(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+                taskToRemove.deleteFromRealm();
+            }
+        });
+    }
+
     @OnClick(R.id.add_task)
     public void addTask() {
         if (materialSheetFab.isSheetVisible()) {
             materialSheetFab.hideSheet();
         }
-        Task newTask = new Task(textInputField.getText().toString());
+        addTaskToRealm();
+    }
+
+    private void addTaskToRealm() {
+        final String newTaskText = textInputField.getText().toString();
         textInputField.setText("");
-        taskAdapter.addTask(newTask);
+        realm.executeTransaction(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+                final Task realmTask = realm.createObject(Task.class);
+                realmTask.setText(newTaskText);
+                taskAdapter.addTask(realmTask);
+            }
+        });
+    }
+
+    @Override
+    public void taskCompleted(final Task task, final boolean isCompleted) {
+        realm.executeTransaction(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+                task.setCompleted(isCompleted);
+            }
+        });
     }
 
     @Override
@@ -84,5 +148,11 @@ public class MainActivity extends AppCompatActivity {
         } else {
             super.onBackPressed();
         }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        realm.close(); // Always remember to close the realm instance
     }
 }

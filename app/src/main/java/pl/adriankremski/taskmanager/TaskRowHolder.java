@@ -19,13 +19,20 @@ public class TaskRowHolder extends RecyclerView.ViewHolder {
 
     private Task task;
 
-    public TaskRowHolder(View itemView) {
+    private TaskCompletedListener taskCompletedListener;
+
+    public interface TaskCompletedListener {
+        void taskCompleted(Task task, boolean isCompleted);
+    }
+
+    public TaskRowHolder(View itemView, final TaskCompletedListener taskCompletedListener) {
         super(itemView);
         ButterKnife.bind(this, itemView);
+        this.taskCompletedListener = taskCompletedListener;
         checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                task.setCompleted(isChecked);
+                taskCompletedListener.taskCompleted(task, isChecked);
             }
         });
     }
