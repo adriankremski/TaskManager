@@ -1,5 +1,6 @@
 package pl.adriankremski.taskmanager;
 
+import android.content.Intent;
 import android.graphics.Point;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
@@ -7,6 +8,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -21,6 +24,7 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import io.realm.Realm;
 import io.realm.RealmResults;
+import io.realm.SyncUser;
 import pl.adriankremski.taskmanager.views.Fab;
 import pl.adriankremski.taskmanager.views.SwipeToDismissTouchListener;
 
@@ -139,6 +143,28 @@ public class MainActivity extends AppCompatActivity implements TaskRowHolder.Tas
                 task.setCompleted(isCompleted);
             }
         });
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.main_menu, menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == R.id.logout) {
+            logout();
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    private void logout() {
+        SyncUser.currentUser().logout();
+
+        Intent intent = new Intent(this, LoginActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(intent);
     }
 
     @Override
