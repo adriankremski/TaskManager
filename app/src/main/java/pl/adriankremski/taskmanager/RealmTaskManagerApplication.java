@@ -7,6 +7,12 @@ import io.realm.RealmConfiguration;
 
 public class RealmTaskManagerApplication extends Application {
 
+    public static final String OBJECT_SERVER_IP = "192.168.21.84";
+    public static final String AUTH_URL = "http://" + OBJECT_SERVER_IP + ":9080/auth";
+    public static final String REALM_URL = "realm://" + OBJECT_SERVER_IP + ":9080/~/realmtasks";
+    public static final String DEFAULT_LIST_ID = "80EB1620-165B-4600-A1B1-D97032FDD9A0";
+    public static String DEFAULT_LIST_NAME = "My Tasks";
+
     @Override
     public void onCreate() {
         super.onCreate();
@@ -14,31 +20,6 @@ public class RealmTaskManagerApplication extends Application {
 
         RealmConfiguration config = new RealmConfiguration.Builder().build();
         Realm.setDefaultConfiguration(config);
-//        mockTasks();
     }
-//
-//    private void mockTasks() {
-//        final List<Task> testTasks = new LinkedList<Task>();
-//        testTasks.add(new Task("Have a coffee"));
-//        testTasks.add(new Task("Check Android Weekly"));
-//        testTasks.add(new Task("Check Your mail"));
-//        testTasks.add(new Task("Standup"));
-//        testTasks.add(new Task("Pretend that You are working on something"));
-//        testTasks.add(new Task("Dinner"));
-//        testTasks.add(new Task("Go home"));
-//
-//        Realm realm = Realm.getDefaultInstance();
-//
-//        realm.executeTransaction(new Realm.Transaction() {
-//            @Override
-//            public void execute(Realm realm) {
-//                for (Task task : testTasks) {
-//                    Task realmTask = realm.createObject(Task.class); // this line creates a new object saved in Realm
-//                    realmTask.setCompleted(false);
-//                    realmTask.setText(task.getText());
-//                }
-//            }
-//        });
-//        realm.close(); // Always remember to close the realm instance
-//    }
+
 }
