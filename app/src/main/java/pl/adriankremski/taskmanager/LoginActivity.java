@@ -7,6 +7,9 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.facebook.CallbackManager;
+import com.facebook.login.widget.LoginButton;
+
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
@@ -25,11 +28,22 @@ public class LoginActivity extends AppCompatActivity {
     @Bind(R.id.progress)
     View progressView;
 
+    @Bind(R.id.facebook_login)
+    LoginButton loginButton;
+
+    CallbackManager callbackManager;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.login_activity);
         ButterKnife.bind(this);
+
+        if (SyncUser.currentUser() != null) {
+            showMainScreen();
+        }
+
+        callbackManager = CallbackManager.Factory.create();
     }
 
     @OnClick(R.id.login)
