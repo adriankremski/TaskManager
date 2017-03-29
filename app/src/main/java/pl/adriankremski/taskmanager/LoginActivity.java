@@ -8,6 +8,10 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.facebook.CallbackManager;
+import com.facebook.FacebookCallback;
+import com.facebook.FacebookException;
+import com.facebook.login.LoginManager;
+import com.facebook.login.LoginResult;
 import com.facebook.login.widget.LoginButton;
 
 import butterknife.Bind;
@@ -44,6 +48,54 @@ public class LoginActivity extends AppCompatActivity {
         }
 
         callbackManager = CallbackManager.Factory.create();
+
+        LoginManager.getInstance().logOut();
+        loginButton.registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
+
+            @Override
+            public void onSuccess(LoginResult loginResult) {
+                SyncCredentials credentials = SyncCredentials.facebook(loginResult.getAccessToken().getToken());
+                SyncUser.loginAsync(credentials, RealmTaskManagerApplication.AUTH_URL, new SyncUser.Callback() {
+                    @Override
+                    public void onSuccess(SyncUser user) {
+                        showMainScreen();
+                        Toast.makeText(getBaseContext(), "You are logged in", Toast.LENGTH_SHORT).show();
+                        progressView.setVisibility(View.GONE);
+                    }
+
+                    @Override
+                    public void onError(ObjectServerError error) {
+                        Toast.makeText(getBaseContext(), "Log in error", Toast.LENGTH_SHORT).show();
+                        progressView.setVisibility(View.GONE);
+                    }
+                });
+            }
+
+            @Override
+            public void onCancel() {
+            }
+
+            @Override
+            public void onError(FacebookException exception) {
+            }
+        });
+//
+//        String serverId = null;
+//        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+//                .requestEmail()
+//                .requestIdToken(serverId)
+//                .build();
+//
+//        GoogleApiClient mGoogleApiClient = new GoogleApiClient.Builder(this)
+//                .enableAutoManage(this, new GoogleApiClient.OnConnectionFailedListener() {
+//                    @Override
+//                    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+//
+//                    }
+//                })
+//                .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
+//                .build();
+
     }
 
     @OnClick(R.id.login)
@@ -97,5 +149,11 @@ public class LoginActivity extends AppCompatActivity {
                 progressView.setVisibility(View.GONE);
             }
         });
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        callbackManager.onActivityResult(requestCode, resultCode, data);
     }
 }
