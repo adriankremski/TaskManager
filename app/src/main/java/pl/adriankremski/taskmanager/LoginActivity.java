@@ -5,10 +5,14 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import io.realm.ObjectServerError;
+import io.realm.SyncCredentials;
+import io.realm.SyncUser;
 
 public class LoginActivity extends AppCompatActivity {
 
@@ -30,7 +34,26 @@ public class LoginActivity extends AppCompatActivity {
 
     @OnClick(R.id.login)
     public void login() {
-        showMainScreen();
+        final String email = usernameLabel.getText().toString();
+        final String password = passwordLabel.getText().toString();
+
+        progressView.setVisibility(View.VISIBLE);
+
+        SyncUser.loginAsync(SyncCredentials.usernamePassword(email, password, false), RealmTaskManagerApplication.AUTH_URL, new SyncUser.Callback() {
+
+            @Override
+            public void onSuccess(SyncUser user) {
+                showMainScreen();
+                Toast.makeText(getBaseContext(), "You are logged in", Toast.LENGTH_SHORT).show();
+                progressView.setVisibility(View.GONE);
+            }
+
+            @Override
+            public void onError(ObjectServerError error) {
+                Toast.makeText(getBaseContext(), "Log in error", Toast.LENGTH_SHORT).show();
+                progressView.setVisibility(View.GONE);
+            }
+        });
     }
 
     private void showMainScreen() {
@@ -41,5 +64,24 @@ public class LoginActivity extends AppCompatActivity {
 
     @OnClick(R.id.register)
     public void register() {
+        final String email = usernameLabel.getText().toString();
+        final String password = passwordLabel.getText().toString();
+
+        progressView.setVisibility(View.VISIBLE);
+
+        SyncUser.loginAsync(SyncCredentials.usernamePassword(email, password, true), RealmTaskManagerApplication.AUTH_URL, new SyncUser.Callback() {
+
+            @Override
+            public void onSuccess(SyncUser user) {
+                Toast.makeText(getBaseContext(), "Account created", Toast.LENGTH_SHORT).show();
+                progressView.setVisibility(View.GONE);
+            }
+
+            @Override
+            public void onError(ObjectServerError error) {
+                Toast.makeText(getBaseContext(), "Registration error", Toast.LENGTH_SHORT).show();
+                progressView.setVisibility(View.GONE);
+            }
+        });
     }
 }
