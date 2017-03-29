@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "316878218094",
+    "project_id": "taskmanager-af35e"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:316878218094:android:e0b100392b722fa6",
+        "android_client_info": {
+          "package_name": "pl.adriankremski.taskmanager"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "316878218094-jf35ltuev05kh5jghi2tmt6f1ogbr421.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "pl.adriankremski.taskmanager",
+            "certificate_hash": "a3f42eda11334949f338c5f83f90f7f36e71bd06"
+          }
+        },
+        {
+          "client_id": "316878218094-25ae2hkam1l1vm9g232pvk18frq4hld7.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBO5D2pftcWosv5n0gXZp6RsGAQNGYYkq0"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 1
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

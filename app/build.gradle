@@ -6,7 +6,7 @@ android {
     buildToolsVersion "25.0.2"
     defaultConfig {
         applicationId "pl.adriankremski.taskmanager"
-        minSdkVersion 21
+        minSdkVersion 15
         targetSdkVersion 25
         versionCode 1
         versionName "1.0"
@@ -34,5 +34,6 @@ dependencies {
     compile "com.jakewharton:butterknife:7.0.1"
     compile 'com.gordonwong:material-sheet-fab:1.2.1' //Library containing the fab button
     compile 'com.facebook.android:facebook-android-sdk:4.15.0'
-
 }
+
+apply plugin: 'com.google.gms.google-services'
